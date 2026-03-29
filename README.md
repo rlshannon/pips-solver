@@ -55,10 +55,12 @@ Then open your browser to `http://localhost:5000`
   - ✅ Unit tests for all components
   - ✅ All-solutions finding capability
   
-- [ ] **Phase 2**: Puzzle Parsing & Fetching
-  - [ ] Research NYT API/web scraping approach
-  - [ ] Implement puzzle parser
-  - [ ] Implement NYT fetcher
+- [x] **Phase 2**: Puzzle Parsing & Fetching - ✅ Complete
+  - ✅ JSON puzzle parser (read/write)
+  - ✅ NYT fetcher with optional browser automation support
+  - ✅ Local puzzle caching system
+  - ✅ Comprehensive tests (12 tests passing)
+  - ✅ Example usage script
   
 - [ ] **Phase 3**: Procedural Generation
   - [ ] Random region generator

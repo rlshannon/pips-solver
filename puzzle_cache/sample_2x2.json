@@ -1,0 +1,16 @@
+{
+  "id": "sample_2x2_easy",
+  "difficulty": "easy",
+  "grid": [
+    [1, 1],
+    [2, 2]
+  ],
+  "regions": {
+    "1": {
+      "sum": 5
+    },
+    "2": {
+      "sum": 7
+    }
+  }
+}
