@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYT Pips Solver</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .control-section {
+            margin-bottom: 30px;
+        }
+
+        .control-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        button.secondary:hover {
+            background: #d0d0d0;
+        }
+
+        input[type="number"],
+        select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .puzzle-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .puzzle-grid {
+            display: inline-grid;
+            gap: 2px;
+            background: #333;
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            border: 1px solid #e0e0e0;
+            color: #333;
+        }
+
+        .cell.region-0 { background: #ffb347; }
+        .cell.region-1 { background: #ff6b6b; }
+        .cell.region-2 { background: #4ecdc4; }
+        .cell.region-3 { background: #ffeb3b; }
+        .cell.region-4 { background: #81c784; }
+        .cell.region-5 { background: #90caf9; }
+        .cell.region-6 { background: #f8bbd0; }
+        .cell.region-7 { background: #d1c4e9; }
+
+        .info-panel {
+            background: #f0f4ff;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .info-panel h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .info-panel .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+
+        .info-panel .info-row strong {
+            color: #333;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .solutions-container {
+            margin-top: 30px;
+        }
+
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .solution-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .solution-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .solution-card.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .regions-info {
+            margin-top: 20px;
+        }
+
+        .region-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .dialog {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dialog.show {
+            display: flex;
+        }
+
+        .dialog-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .dialog-content h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .dialog-content input,
+        .dialog-content select {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎲 NYT Pips Solver</h1>
+            <p>Generate, solve, and visualize Pips puzzles</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Left Panel: Controls -->
+            <div class="panel">
+                <h2>Controls</h2>
+                
+                <div class="status" id="status"></div>
+
+                <!-- Generate Section -->
+                <div class="control-section">
+                    <h3>Generate Puzzle</h3>
+                    <div class="control-group">
+                        <label>Width: <input type="number" id="genWidth" value="4" min="2" max="12"></label>
+                        <label>Height: <input type="number" id="genHeight" value="4" min="2" max="12"></label>
+                    </div>
+                    <div class="control-group">
+                        <label>Difficulty:
+                            <select id="difficulty">
+                                <option>easy</option>
+                                <option>medium</option>
+                                <option>hard</option>
+                            </select>
+                        </label>
+                    </div>
+                    <button onclick="generatePuzzle()">Generate</button>
+                </div>
+
+                <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
+
+                <!-- Solve Section -->
+                <div class="control-section">
+                    <h3>Solve</h3>
+                    <button onclick="solvePuzzle()">Find All Solutions</button>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: #666;">Finds all valid solutions for the current puzzle</p>
+                </div>
+
+                <div id="puzzleInfo"></div>
+            </div>
+
+            <!-- Right Panel: Puzzle Display -->
+            <div class="panel">
+                <h2>Puzzle</h2>
+                
+                <div class="puzzle-display" id="puzzleDisplay">
+                    <p style="text-align: center; color: #999;">Generate or load a puzzle to begin</p>
+                </div>
+
+                <div id="regionsDisplay"></div>
+            </div>
+        </div>
+
+        <!-- Solutions Section -->
+        <div class="panel">
+            <h2>Solutions</h2>
+            <div id="solutionsSection" style="display: none;">
+                <p id="solutionCount" style="margin-bottom: 15px;"></p>
+                <div class="solutions-grid" id="solutionsGrid"></div>
+            </div>
+            <div id="noSolutions" style="text-align: center; color: #999;">
+                <p>Solve the puzzle to see solutions</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate Dialog -->
+    <div class="dialog" id="generateDialog">
+        <div class="dialog-content">
+            <h3>Generate New Puzzle</h3>
+            <label>Width: <input type="number" id="dialogWidth" value="7" min="2" max="12"></label>
+            <label>Height: <input type="number" id="dialogHeight" value="9" min="2" max="12"></label>
+            <label>Difficulty:
+                <select id="dialogDifficulty">
+                    <option>easy</option>
+                    <option selected>medium</option>
+                    <option>hard</option>
+                </select>
+            </label>
+            <div class="dialog-buttons">
+                <button class="secondary" onclick="closeDialog()">Cancel</button>
+                <button onclick="confirmGenerate()">Generate</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 NYT Pips Solver | Built with Python, Flask & JavaScript</p>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        let currentPuzzle = null;
+        let currentSolutions = [];
+
+        // Status message display
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.className = `status show ${type}`;
+            statusEl.textContent = message;
+            if (type !== 'loading') {
+                setTimeout(() => statusEl.classList.remove('show'), 5000);
+            }
+        }
+
+        // Generate random puzzle
+        async function generatePuzzle() {
+            const width = parseInt(document.getElementById('genWidth').value);
+            const height = parseInt(document.getElementById('genHeight').value);
+            const difficulty = document.getElementById('difficulty').value;
+
+            if (width < 2 || height < 2 || width > 12 || height > 12) {
+                showStatus('Grid must be between 2x2 and 12x12', 'error');
+                return;
+            }
+
+            if ((width * height) % 2 !== 0) {
+                showStatus('Grid must have even number of cells', 'error');
+                return;
+            }
+
+            showStatus('Generating puzzle...', 'loading');
+
+            try {
+                const response = await fetch(`${API_URL}/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        width, height, difficulty,
+                        max_attempts: 10
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error);
+                }
+
+                const data = await response.json();
+                currentPuzzle = data.puzzle;
+                currentSolutions = [];
+                displayPuzzle();
+                showStatus('Puzzle generated successfully!', 'success');
+                document.getElementById('solutionsSection').style.display = 'none';
+                document.getElementById('noSolutions').style.display = 'block';
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Solve puzzle
+        async function solvePuzzle() {
+            if (!currentPuzzle) {
+                showStatus('Please generate or load a puzzle first', 'error');
+                return;
+            }
+
+            showStatus('Solving puzzle...', 'loading');
+
+            try {
+                const response = await fetch(`${API_URL}/solve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentPuzzle)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error);
+                }
+
+                const data = await response.json();
+                currentSolutions = data.solutions;
+
+                if (currentSolutions.length > 0) {
+                    showStatus(`Found ${currentSolutions.length} solution(s)!`, 'success');
+                    displaySolutions();
+                } else {
+                    showStatus('No solutions found', 'info');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Display puzzle
+        function displayPuzzle() {
+            if (!currentPuzzle) return;
+
+            const { rows, cols, regions } = currentPuzzle;
+            const display = document.getElementById('puzzleDisplay');
+
+            let html = '<div class="puzzle-grid" style="grid-template-columns: repeat(' + cols + ', 1fr);">';
+
+            // Create grid cells
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    // Find which region this cell belongs to
+                    let regionId = 0;
+                    for (const [rid, region] of Object.entries(regions)) {
+                        if (region.cells.some(cell => cell[0] === r && cell[1] === c)) {
+                            regionId = rid;
+                            break;
+                        }
+                    }
+                    html += `<div class="cell region-${regionId}"></div>`;
+                }
+            }
+
+            html += '</div>';
+            display.innerHTML = html;
+
+            // Display info
+            const infoHtml = `
+                <div class="info-panel">
+                    <h4>Puzzle Info</h4>
+                    <div class="info-row">
+                        <strong>Size:</strong> ${rows} × ${cols}
+                    </div>
+                    <div class="info-row">
+                        <strong>Regions:</strong> ${Object.keys(regions).length}
+                    </div>
+                    <div class="info-row">
+                        <strong>Difficulty:</strong> ${currentPuzzle.difficulty || 'N/A'}
+                    </div>
+                </div>
+            `;
+            document.getElementById('puzzleInfo').innerHTML = infoHtml;
+
+            // Display regions
+            let regionsHtml = '<div class="regions-info"><h4>Regions</h4>';
+            for (const [rid, region] of Object.entries(regions)) {
+                regionsHtml += `
+                    <div class="region-item">
+                        Region ${rid}: Target sum = <strong>${region.sum}</strong> (${region.cell_count} cells)
+                    </div>
+                `;
+            }
+            regionsHtml += '</div>';
+            document.getElementById('regionsDisplay').innerHTML = regionsHtml;
+        }
+
+        // Display solutions
+        function displaySolutions() {
+            const section = document.getElementById('solutionsSection');
+            const grid = document.getElementById('solutionsGrid');
+            const noSolutions = document.getElementById('noSolutions');
+
+            section.style.display = 'block';
+            noSolutions.style.display = 'none';
+
+            document.getElementById('solutionCount').textContent = 
+                `Found ${currentSolutions.length} solution${currentSolutions.length !== 1 ? 's' : ''}`;
+
+            grid.innerHTML = currentSolutions.map((solution, index) => `
+                <div class="solution-card" onclick="viewSolution(${index})">
+                    <h4>Solution ${index + 1}</h4>
+                    <p>${solution.placements.length} dominoes</p>
+                </div>
+            `).join('');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            showStatus('Ready to generate puzzles!', 'success');
+        });
+    </script>
+</body>
+</html>

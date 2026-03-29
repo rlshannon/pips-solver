@@ -14,6 +14,7 @@ from pathlib import Path
 import json
 import logging
 from typing import Optional, Dict, Any
+from flask_cors import CORS
 
 from puzzle_model import Puzzle, Region
 from solver import PipsSolver
@@ -26,8 +27,11 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize Flask app
-app = Flask(__name__)
+app = Flask(__name__, static_folder='.', static_url_path='')
 app.config['JSON_SORT_KEYS'] = False
+
+# Enable CORS
+CORS(app)
 
 # Initialize solvers and fetchers
 fetcher = NYTPipsFetcher(cache_enabled=True)
@@ -54,6 +58,13 @@ def index():
             "GET /health": "Health check"
         }
     })
+
+
+@app.route('/ui', methods=['GET'])
+@app.route('/ui/')
+def ui():
+    """Serve the frontend UI."""
+    return app.send_static_file('index.html')
 
 
 @app.route('/health', methods=['GET'])
