@@ -235,10 +235,10 @@ class BrowserAutomationFetcher:
             return None
         
         try:
-            from selenium import webdriver
-            from selenium.webdriver.common.by import By
-            from selenium.webdriver.support.ui import WebDriverWait
-            from selenium.webdriver.support import expected_conditions as EC
+            from selenium import webdriver  # type: ignore
+            from selenium.webdriver.common.by import By  # type: ignore
+            from selenium.webdriver.support.ui import WebDriverWait  # type: ignore
+            from selenium.webdriver.support import expected_conditions as EC  # type: ignore
             
             # Initialize Chrome driver
             options = webdriver.ChromeOptions()
