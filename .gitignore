@@ -18,6 +18,14 @@ lib64/
 parts/
 sdist/
 var/
+
+# Debug/temporary files during development
+debug_*.py
+test_fix.py
+test_summary.py
+test_backend.py
+example_usage.py
+phase3_status.py
 wheels/
 *.egg-info/
 .installed.cfg
