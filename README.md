@@ -1,53 +1,140 @@
-# NYT Pips Solver
+# 🎲 NYT Pips Solver
 
-A Python-based solver for the New York Times Pips game with a web-based interface. Features include:
+A complete, production-ready Python application for solving, generating, and visualizing NYT Pips puzzles with a web interface and REST API.
 
-- **Fetch & Solve**: Automatically fetch the current NYT Pips puzzle and find ALL solutions
-- **Visualize Solutions**: Interactive HTML/SVG visualization of puzzles and solutions
-- **Generate Puzzles**: Procedurally generate random Pips puzzles with configurable difficulty
-- **Web Interface**: Flask backend with interactive web frontend
+## ✨ Features
 
-## Project Structure
+- **Complete Solver** - Find ALL solutions to any Pips puzzle using intelligent backtracking
+- **Procedural Generation** - Generate random playable Pips puzzles at multiple difficulty levels  
+- **Puzzle Fetching** - Load puzzles from NYT, files, or local cache
+- **Interactive Web UI** - Beautiful HTML/CSS/JavaScript interface
+- **REST API** - Full REST API for all puzzle operations
+- **Optimized Performance** - Early pruning and constraint satisfaction for fast solving
 
-```
-├── puzzle_model.py       # Core data structures (Puzzle, Domino, Region, PuzzleState)
-├── solver.py             # Constraint-satisfaction solver with backtracking
-├── nyt_fetcher.py        # Fetch puzzles from NYT (Phase 2)
-├── generator.py          # Procedural puzzle generation (Phase 3)
-├── app.py                # Flask backend (Phase 4)
-├── templates/            # HTML templates (Phase 5)
-├── static/               # CSS and JavaScript (Phase 5)
-└── requirements.txt      # Python dependencies
-```
+## 📊 Project Status
 
-## Installation
+| Phase | Component | Tests | Status |
+|-------|-----------|-------|--------|
+| 1 | Core Solver | 14 | ✅ Complete |
+| 2 | Parsing & Fetching | 12 | ✅ Complete |
+| 3 | Procedural Generation | 12 | ✅ Complete |
+| 4 | Flask Backend API | 5 | ✅ Complete |
+| 5 | Frontend UI | - | ✅ Complete |
+| 6 | Integration Testing | 6 | ✅ Complete |
+| **TOTAL** | **All Systems** | **49 tests** | ✅ **COMPLETE** |
 
-1. Create a conda environment or virtual environment:
-   ```bash
-   conda create -n pips-solver python=3.11
-   conda activate pips-solver
-   ```
+## 🚀 Quick Start
 
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+### Installation
 
-## Usage
-
-### Running Tests
 ```bash
-python -m unittest test_solver -v
+# 1. Create conda environment
+conda create -n pips python=3.11
+conda activate pips
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Verify setup (run integration tests)
+python e2e_test.py
 ```
 
-### Starting the Web Server (Phase 4+)
+### Running the Application
+
 ```bash
+# Start the Flask server
 python app.py
+
+# Open browser to:
+#   - Web UI: http://localhost:5000/ui
+#   - API Info: http://localhost:5000
 ```
 
-Then open your browser to `http://localhost:5000`
+## 📚 Project Structure
 
-## Development Status
+**Core Engine:**
+- `puzzle_model.py` - Data structures (Puzzle, Domino, Region, PuzzleState)
+- `solver.py` - Constraint-satisfaction solver with backtracking
+- `puzzle_parser.py` - JSON serialization/deserialization
+
+**Data Sources:**
+- `nyt_fetcher.py` - NYT puzzle fetching with caching
+
+**Generation:**
+- `generator.py` - Procedural puzzle generation with difficulty levels
+
+**Web Application:**
+- `app.py` - Flask REST API (6 endpoints)
+- `index.html` - Interactive web UI
+
+**Testing:**
+- `test_solver.py` - Core solver tests (14 tests)
+- `test_parser_fetcher.py` - Parser/fetcher tests (12 tests)
+- `test_generator.py` - Generation tests (12 tests)
+- `e2e_test.py` - End-to-end integration tests (6 tests)
+
+## 🔌 REST API
+
+### Endpoints
+
+**Generate Puzzle**
+```bash
+POST /generate
+{"width": 7, "height": 9, "difficulty": "medium", "max_attempts": 10}
+```
+
+**Solve Puzzle**
+```bash
+POST /solve
+{"rows": 7, "cols": 9, "grid": [[...]], "regions": {...}}
+```
+
+**Parse Puzzle**
+```bash
+POST /puzzle/parse
+{"grid": [[0, 0], [1, 1]], "regions": {"0": {"sum": 7}, "1": {"sum": 5}}}
+```
+
+**Visualize**
+```bash
+POST /visualize
+{"puzzle": {...}}
+```
+
+**Health Check**
+```bash
+GET /health
+```
+
+**UI**
+```bash
+GET /ui
+```
+
+## 🧪 Running Tests
+
+```bash
+# Run all tests
+python -m unittest discover -s . -p "test_*.py" -v
+
+# Run specific test suite
+python test_solver.py
+python test_parser_fetcher.py
+python test_generator.py
+
+# Run end-to-end integration tests
+python e2e_test.py
+```
+
+## 📝 Development Notes
+
+- All 3 original requirements implemented ✅
+  - Fetch puzzles from NYT and visualize
+  - Find ALL solutions to any puzzle
+  - Procedurally generate random puzzles
+- 49 unit and integration tests (100% pass rate)
+- Production-ready with CORS support and error handling
+- Git repository initialized with clean commit history
 
 - [x] **Phase 1**: Core Solver Engine - ✅ Complete
   - ✅ Puzzle data model (Puzzle, Region, Domino classes)
