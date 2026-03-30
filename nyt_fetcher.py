@@ -221,7 +221,7 @@ class BrowserAutomationFetcher:
     def _check_selenium(self) -> bool:
         """Check if Selenium is available."""
         try:
-            import selenium
+            import selenium  # type: ignore
             return True
         except ImportError:
             print("Warning: selenium not installed. Browser automation unavailable.")
